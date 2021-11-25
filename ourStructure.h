@@ -1,4 +1,4 @@
-#ifndef OUR_STRUCTURES_H
+#ifndef OUR_STRUCTURE_H
 #define OUR_STRUCTURE_H
 
 #include "AVL.h"
@@ -13,8 +13,8 @@ class OurStructure
 
 
     public:
-        
-}
+
+};
 
 
 
