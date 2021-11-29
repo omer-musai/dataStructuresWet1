@@ -4,6 +4,9 @@
 //not sure if necessary
 typedef enum
 {
+    AVL_ALREADY_EXIST,
+    AVL_SUCCESS,
+
 
 } AVLres;
 
@@ -15,6 +18,8 @@ class AVL
 
         typedef struct node_t
         {
+            explicit Node(T element, Node father, int height) : element(element), father(father), height(height), rightSon(nullptr), leftSon(nullptr){}
+            int height; //of the sub_tree that this node is the root of
             T element;
             node_t* father;
             node_t* rightSon;
@@ -30,10 +35,13 @@ class AVL
         void LL(T& element);
         void RL(T& element);
         void LR(T& element); 
+        void updateTree(Node current);
+        
 
 
     public:
         AVLres insert(const T& element);
+        AVLres find(const T& element);
         AVLres remove(int id);
         AVLres inOrder();
 
