@@ -252,7 +252,7 @@ private:
         if (orderRel == equal)
         {
             //Trying to add a node that was already in the tree.
-            throw Failure();
+            throw Failure("Trying to add a node that was already added.");
         }
 
         if (orderRel == larger)
@@ -540,7 +540,7 @@ private:
         {
             //Can't just check if value > parent value because sorting may momentarily be broken
             //after using swapNodes for node removal.
-            if (node->getValue() == parent->getLeft()->getValue())
+            if (parent->getLeft() != nullptr && node->getValue() == parent->getLeft()->getValue())
             {
                 parent->setLeft(nullptr);
             }
@@ -636,7 +636,7 @@ public:
         if (orderRel != equal)
         {
             //Node isn't in the tree.
-            throw Failure();
+            throw Failure("Tried to remove non-existent node.");
         }
         removeNode_updateHighestAux(node);
         Node<T>* nodeToFix = removeNodeAux(node);
@@ -707,7 +707,7 @@ public:
         Node<T>* node = findLocation(value, orderRel);
         if (orderRel != equal)
         {
-            throw Failure();
+            throw Failure("Tried to fetch non-existent node.");
         }
         return &(node->getValue());
     }

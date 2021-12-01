@@ -11,22 +11,30 @@ class Exception : public std::exception
 		Exception(const Exception& other) = default;
 		virtual ~Exception() noexcept = default;
 
-		explicit Exception(const std::string& error_type) : error_type(error_type)
+		explicit Exception(const std::string& error_type, const std::string& error_message)
 		{
-			this->error_type = "An error has occurred: " + error_type;
+		    if (error_message == "")
+            {
+		        this->error_message = error_type;
+            }
+		    else
+            {
+		        this->error_message =  error_type + ": " + error_message;
+            }
 		}
 		
 		const char* what() const noexcept override {
-			return error_type.c_str();
+			return error_message.c_str();
 		}
 	private:
 		std::string error_type;
+		std::string error_message;
 };
 
 class AllocationError : public Exception
 {
 	public:
-		explicit AllocationError() : Exception("AllocationError") {}
+		explicit AllocationError(const std::string& msg = "") : Exception(msg, "AllocationError") {}
 
 };
 
@@ -34,14 +42,14 @@ class AllocationError : public Exception
 class InvalidInput : public Exception
 {
 	public:
-		explicit InvalidInput() : Exception("InvalidInput") {}
+		explicit InvalidInput(const std::string& msg = "") : Exception(msg, "InvalidInput") {}
 
 };
 
 class Failure : public Exception
 {
 	public:
-		explicit Failure() : Exception("Failure") {}
+		explicit Failure(const std::string& msg = "") : Exception(msg, "Failure") {}
 };
 
 #endif //GAME_EXCEPTIONS_H

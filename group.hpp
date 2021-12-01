@@ -85,7 +85,7 @@ class Group
 		bool operator>=(const Group& other) const
 		{
             assert(!dummy);
-			return other >= (*this);
+			return other <= (*this);
 		}
 		
 		bool operator<(const Group& other) const

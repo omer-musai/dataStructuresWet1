@@ -38,23 +38,23 @@ void GameSystem::removePlayer(int player_id)
 
 void GameSystem::replaceGroup(int groupId, int replacementId)
 {
-	if (replacementId <= 0 || groupId <= 0)
+	if (replacementId <= 0 || groupId <= 0 || groupId == replacementId) //Check if last is valid.
 	{
-		throw InvalidInput();
+		throw InvalidInput("Invalid input in replaceGroup.");
 	}
 	
-	Group *other = this->groups.getValuePtr(groupId),
-		*replacement = this->groups.getValuePtr(groupId);
+	Group *group = this->groups.getValuePtr(groupId),
+		*replacement = this->groups.getValuePtr(replacementId);
 	
-	other->mergeGroups(*replacement);
-	this->groups.removeNode(*replacement);
+	replacement->mergeGroups(*group);
+	this->groups.removeNode(*group);
 }
 
 int GameSystem::getHighestLevel(int group_id)
 {
     if(group_id == 0)
     {
-        throw InvalidInput();
+        throw InvalidInput("Invalid input in getHighestLevel.");
     }
 
     if(group_id < 0)
@@ -79,7 +79,7 @@ int* GameSystem::getAllPlayersByLevel(int group_id, int* numOfPlayers)
 {
     if(group_id == 0)
     {
-        throw InvalidInput();
+        throw InvalidInput("Invalid input in getAllPlayersByLevel.");
     }
 
     if(group_id < 0)
@@ -128,7 +128,7 @@ int* GameSystem::getGroupsHighestLevel(int numOfGroups)
 {
     if(numOfGroups < 1)
     {
-        throw InvalidInput();
+        throw InvalidInput("Invalid input in getGroupsHighestLevel.");
     }
     if(numOfGroups < this->nonEmptyGroups.getSize())
     {

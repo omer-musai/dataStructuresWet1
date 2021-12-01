@@ -1,5 +1,8 @@
-#include "AVLTree.hpp"
+#include "gameSystem.hpp"
 #include <iostream>
+
+using std::cout;
+using std::endl;
 
 class Printer
 {
@@ -74,8 +77,7 @@ int main() {
     tree->inorder(mp);
     tree->inorder(tv);
     tv.printRes();*/
-
-    MegaPrinter mp;
+    /*MegaPrinter mp;
     TreeValidator tv;
 
     int arrOdd[] = {1,3,5,7,9},
@@ -90,9 +92,41 @@ int main() {
     mergedTree->inorder(mp); std::cout << std::endl;
     std::cout << "Highest: " << mergedTree->getHighest() << std::endl;
     mergedTree->inorder(tv);
-    tv.printRes();
+    tv.printRes();*/
 
-
+    GameSystem system;
+    system.addGroup(1);
+    system.addGroup(4);
+    system.addGroup(3);
+    system.addGroup(2);
+    system.addPlayer(5, 1, 3);
+    system.addPlayer(4, 2, 3);
+    system.addPlayer(17, 1, 3);
+    std::cout << "Highest: " << system.getHighestLevel(-1) << std::endl;
+    std::cout << "Gr. 1 Highest: " << system.getHighestLevel(1) << std::endl;
+    std::cout << "Gr. 2 Highest: " << system.getHighestLevel(2) << std::endl;
+    int count, *players = system.getAllPlayersByLevel(-1, &count);
+    cout << "All players: ";
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    free(players);
+    players = system.getAllPlayersByLevel(1, &count);
+    cout << "\nGr. 1 players: ";
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    free(players);
+    cout << "\nGr. 1 players post repl.: ";
+    system.replaceGroup(2, 1);
+    players = system.getAllPlayersByLevel(1, &count);
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    free(players);
+    cout << "\nGr. 2 players post repl.: ";
+    try {
+        players = system.getAllPlayersByLevel(2, &count);
+        for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+        free(players);
+    }
+    catch (Failure exc) {
+        cout << "Gr. 2 was removed :)\n";
+    }
 
     return 0;
 }
