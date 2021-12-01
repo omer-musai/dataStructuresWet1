@@ -11,17 +11,16 @@ class Exception : public std::exception
 		Exception(const Exception& other) = default;
 		virtual ~Exception() noexcept = default;
 
-		explicit Exception(std::string& error_message) : error_type(error_type)
+		explicit Exception(const std::string& error_type) : error_type(error_type)
 		{
-			error_message = (error_type);
+			this->error_type = "An error has occurred: " + error_type;
 		}
 		
 		const char* what() const noexcept override {
-			return error_message.c_str();
+			return error_type.c_str();
 		}
 	private:
 		std::string error_type;
-		std::string error_message;
 };
 
 class AllocationError : public Exception

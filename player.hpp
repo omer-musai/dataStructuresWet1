@@ -1,8 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "group.hpp"
-#include "game_exeptions.hpp"
+#include "game_exceptions.hpp"
+
+class Group;
+
 class Player
 {
     private:
@@ -10,10 +12,12 @@ class Player
         int level;
         Group* groupPtr;
         Group* nonEmptyGroupPtr;
+        bool dummy; //"Dummy players" will be used to perform searching by key in the tree & initializing arrays.
 
     public:
-        Player() = delete;
-        explicit Player(int id, int level, Group* groupPtr) : id(id), level(level) ,groupPtr(groupPtr)
+        explicit Player(int id = 0) : id(id), level(-1), groupPtr(nullptr), nonEmptyGroupPtr(nullptr), dummy(true) {}
+        explicit Player(int id, int level, Group* groupPtr) : id(id), level(level),
+            groupPtr(groupPtr), nonEmptyGroupPtr(nullptr), dummy(false)
         {
             if(level < 0 || id <= 0)
             {
@@ -23,6 +27,8 @@ class Player
        
         void increaseLevel(int n)
         {
+            assert(dummy == false);
+
             if(n <= 0)
             {
                 throw InvalidInput();
@@ -31,26 +37,33 @@ class Player
             this->level += n;
         }
 
-        int getId()
+        int getId() const
         {
             return id;
         }
 
-        Group* getGroupPtr(bool mainTree = true)
+        Group* getGroupPtr(bool mainTree = true) const
         {
+            assert(dummy == false);
+
             return mainTree ? this->groupPtr : this->nonEmptyGroupPtr;
         }
 
         bool operator<=(const Player& player) const
         {
+            if (dummy)
+            {
+                return this->id >= player.id;
+            }
+
             if (this->level == player.level)
             {
                 //lower id value means higher player value
-                return this->id >= player.id ? true : false;
+                return this->id >= player.id;
             }
             else
             {
-                return this->level < player.level ? true : false;
+                return this->level < player.level;
             }
         }
         bool operator>=(const Player& player) const
@@ -65,15 +78,19 @@ class Player
 
         bool operator<(const Player& player) const
         {
-            return !(*this >= player);
+            return player > *this;
         }
 
-        bool operator==()(const Player& player) const
+        bool operator==(const Player& player) const
         {
-            assert(this->id == player.id && this->level != player.level);
+            assert(dummy || !(this->id == player.id && this->level != player.level));
         
             return this->id == player.id;
+        }
 
+        bool operator!=(const Player& player) const
+        {
+            return !(*this == player);
         }
 
 

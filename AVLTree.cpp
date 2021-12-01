@@ -85,12 +85,13 @@ int main() {
         mergedTree;
     oddTree->inorder(mp); std::cout << std::endl;
     evenTree->inorder(mp); std::cout << std::endl;
-    mergedTree = AVLTree<int>::mergeTrees(evenTree, oddTree);
+    mergedTree = AVLTree<int>::mergeTrees(*evenTree, *oddTree);
     std::cout << "Post-merge:" << std::endl;
     mergedTree->inorder(mp); std::cout << std::endl;
     std::cout << "Highest: " << mergedTree->getHighest() << std::endl;
     mergedTree->inorder(tv);
     tv.printRes();
+
 
 
     return 0;

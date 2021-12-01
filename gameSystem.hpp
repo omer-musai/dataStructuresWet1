@@ -2,9 +2,9 @@
 #define GAME_SYSTEM_H
 
 #include "AVLTree.hpp"
-#include "player.hpp"
+#include "Player.hpp"
 #include "playerById.hpp"
-#include "group.hpp"
+#include "Group.hpp"
 
 class GameSystem
 {

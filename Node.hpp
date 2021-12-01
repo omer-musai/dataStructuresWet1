@@ -6,46 +6,42 @@ template <class T>
 class Node
 {
 private:
-    T value;
+    T* value;
     Node<T>* left;
     Node<T>* right;
     Node<T>* parent;
     int height;
 public:
-    explicit Node(const T& value)
+    explicit Node(const T& value) : left(nullptr), right(nullptr), parent(nullptr), height(0)
     {
-        this->value = value;
-        left = nullptr;
-        right = nullptr;
-        parent = nullptr;
-        height = 0;
+        this->setValue(value);
     }
 
     Node<T>& operator=(Node<T>& other) = delete;
 
     Node() = delete;
 
-    void setLeft(Node<T>* left)
+    void setLeft(Node<T>* newLeft)
     {
-        this->left = left;
-        if (left != nullptr)
+        this->left = newLeft;
+        if (newLeft != nullptr)
         {
-            left->parent = this;
+            newLeft->parent = this;
         }
     }
 
-    void setRight(Node<T>* right)
+    void setRight(Node<T>* newRight)
     {
-        this->right = right;
-        if (right != nullptr)
+        this->right = newRight;
+        if (newRight != nullptr)
         {
-            right->parent = this;
+            newRight->parent = this;
         }
     }
 
-    void setParent(Node<T>* parent)
+    void setParent(Node<T>* newParent)
     {
-        this->parent = parent;
+        this->parent = newParent;
     }
 
     Node<T>* getLeft()
@@ -69,34 +65,19 @@ public:
         this->height = 1 + (lh > rh ? lh : rh);
     }
 
-    void setHeight(int height)
-    {
-        this->height = height;
-    }
-
-    void incrementHeight()
-    {
-        ++height;
-    }
-
-    void decrementHeight()
-    {
-        --height;
-    }
-
     int getHeight() const
     {
         return height;
     }
 
-    const T& getValue() const
+    T& getValue() const
     {
-        return value;
+        return *value;
     }
 
-    void setValue(const T& value)
+    void setValue(const T& newValue)
     {
-        this->value = value;
+        this->value = new T(newValue);
     }
 
     int getLeftHeight() const
@@ -109,12 +90,13 @@ public:
         return right == nullptr ? -1 : right->height;
     }
 
-    bool isRoot() const
+    ~Node()
     {
-        return parent == nullptr;
+        if (value != nullptr)
+        {
+            delete value;
+        }
     }
-
-    ~Node() = default;
 };
 
 #endif //AVLTREE_NODE

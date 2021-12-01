@@ -1,18 +1,18 @@
 #ifndef PLAYER_BY_ID_H
 #define PLAYER_BY_ID_H
 
-#include "group.hpp"
-#include "game_exeptions.hpp"
-#include "player.hpp"
+#include "Group.hpp"
+#include "game_exceptions.hpp"
+#include "Player.hpp"
 class PlayerById
 {
     private:
         int id;
-        Player* player;
+        const Player* player;
 
     public:
         PlayerById() = delete;
-        explicit PlayerById(int id, Player* player) : id(id), player(player)
+        explicit PlayerById(int id, const Player* player) : id(id), player(player)
         {
             if(id <= 0)
             {
@@ -20,35 +20,40 @@ class PlayerById
             }
         }
         
-        Player* getPlayer()
+        const Player* getPlayerPtr()
         {
             return player;
         }
         
-        bool operator<=(const PlayerById& other)
+        bool operator<=(const PlayerById& other) const
 		{
-			return this->id <= other.id;
+			return this->id >= other.id;
 		}
 		
-		bool operator>(const PlayerById& other)
+		bool operator>(const PlayerById& other) const
 		{
 			return !((*this) <= other);
 		}
 		
-		bool operator>=(const PlayerById& other)
+		bool operator>=(const PlayerById& other) const
 		{
-			return other ->= (*this);
+			return other <= (*this);
 		}
 		
-		bool operator<(const PlayerById& other)
+		bool operator<(const PlayerById& other) const
 		{
 			return other > (*this);
 		}
 		
-		bool operator==(const PlayerById& other)
+		bool operator==(const PlayerById& other) const
 		{
 			return (*this) <= other && (*this) >= other;
 		}
+
+		bool operator!=(const PlayerById& other) const
+        {
+            return !(*this == other);
+        }
 };
 
 

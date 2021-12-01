@@ -4,6 +4,7 @@
 #define AVL_BALANCE_BOUND 1
 
 #include "Node.hpp"
+#include "game_exceptions.hpp"
 
 #include <cassert>
 #include <memory>
@@ -35,20 +36,16 @@ private:
             void operator()(T value, int height, T parentValue, T leftValue, T rightValue, int BF) {
                 if (size < 0 || index < size) {
                     array[index++] = value;
-
-                    //To get rid of those annoying "parameter is never used" warnings:
-                    parentValue + leftValue + rightValue;
-                    height + BF;
                 }
             }
         };
 
-        static T* treeToArray(std::shared_ptr<AVLTree<T>> tree) {
-            T* array = new T[tree->getSize()];
+        static T* treeToArray(const AVLTree<T>& tree) {
+            T* array = new T[tree.getSize()];
             try
             {
                 ArrayFromTreePopulator populator(array);
-                tree->inorder(populator);
+                tree.inorder(populator);
             }
             catch (std::exception& exception)
             {
@@ -88,7 +85,7 @@ private:
         };
 
         //This uses the algorithm described & proved in the doc.
-        static std::shared_ptr<AVLTree<T>> AVLFromArray(T* arr, int size) {
+        static std::shared_ptr<AVLTree<T>> AVLFromArray(const T* arr, int size) {
             assert(size > 0);
 
             std::shared_ptr<AVLTree<T>> tree = std::shared_ptr<AVLTree<T>>(new AVLTree<T>());
@@ -106,15 +103,18 @@ private:
             return tree;
         }
 
-        static std::shared_ptr<AVLTree<T>> mergeTrees(std::shared_ptr<AVLTree<T>> t1, std::shared_ptr<AVLTree<T>> t2) {
+        //THIS RUINS THE PARAMETER TREES. Careful!
+        static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2) {
             T *t1arr = nullptr, *t2arr = nullptr, *merged = nullptr;
-            int totalSize = t1->getSize() + t2->getSize();
+            int totalSize = t1.getSize() + t2.getSize();
             std::shared_ptr<AVLTree<T>> result;
             try {
                 t1arr = treeToArray(t1);
                 t2arr = treeToArray(t2);
-                merged = arrayMerge(t1arr, t1->getSize(), t2arr, t2->getSize());
+                merged = arrayMerge(t1arr, t1.getSize(), t2arr, t2.getSize());
                 result = treeFromArray(merged, totalSize);
+                t1.clean();
+                t2.clean();
             }
             catch (std::exception &exception) {
 
@@ -157,6 +157,10 @@ private:
         assert(root != nullptr);
         root->setRight(tree->root);
         tree->root = nullptr; //To ensure no scary O(n) cleaning operations take place.
+        if (tree->highest != nullptr)
+        {
+            this->highest = tree->highest;
+        }
         root->updateHeight();
         nodeCount = tree->nodeCount + nodeCount;
     }
@@ -225,16 +229,16 @@ private:
     }
 
     template <class A>
-    void inorderAux(A& action, Node<T>* curr)
+    void inorderAux(A& action, Node<T>* curr) const
     {
         if (curr == nullptr) return;
         inorderAux(action, curr->getLeft());
         action(
             curr->getValue(),
             curr->getHeight(),
-            curr->getLeft() == nullptr ? -1000 : curr->getLeft()->getValue(),
-            curr->getRight() == nullptr ? -1000 : curr->getRight()->getValue(),
-            curr->getParent() == nullptr ? -1000 : curr->getParent()->getValue(),
+            curr->getLeft() == nullptr ? T() : curr->getLeft()->getValue(),
+            curr->getRight() == nullptr ? T() : curr->getRight()->getValue(),
+            curr->getParent() == nullptr ? T() : curr->getParent()->getValue(),
             getBalanceFactor(curr)
         );
         inorderAux(action, curr->getRight());
@@ -245,7 +249,11 @@ private:
      */
     void addNodeToLocation(Node<T>* location, Node<T>* newNode, Order orderRel)
     {
-        assert(orderRel != equal); //Trying to insert a node that's already within the tree. Choose how to handle. //TODO
+        if (orderRel == equal)
+        {
+            //Trying to add a node that was already in the tree.
+            throw Failure();
+        }
 
         if (orderRel == larger)
         {
@@ -625,7 +633,11 @@ public:
     {
         Order orderRel;
         Node<T>* node = findLocation(value, orderRel);
-        assert (orderRel == equal); //If it wasn't found (!= equal), we need to throw some exception. Handle. //TODO
+        if (orderRel != equal)
+        {
+            //Node isn't in the tree.
+            throw Failure();
+        }
         removeNode_updateHighestAux(node);
         Node<T>* nodeToFix = removeNodeAux(node);
         --nodeCount;
@@ -668,18 +680,18 @@ public:
         }
     }
 
-    T getHighest()
+    const T& getHighest() const
     {
         return highest->getValue();
     }
 
     template <class A>
-    void inorder(A& action)
+    void inorder(A& action) const
     {
         inorderAux(action, root);
     }
 
-    int getSize()
+    int getSize() const
     {
         return this->nodeCount;
     }
@@ -687,8 +699,10 @@ public:
     /*
      * This function emulates searching an object by key. (For example: getValuePtr(Group(3)) to find group with id==3.)
      */
-    T* getValuePtr(T value)
+    template <class K>
+    T* getValuePtr(K key)
     {
+        T value(key);
         Order orderRel;
         Node<T>* node = findLocation(value, orderRel);
         if (orderRel != equal)
@@ -698,12 +712,20 @@ public:
         return &(node->getValue());
     }
 
-    static std::shared_ptr<AVLTree<T>> treeFromArray(T* arr, int size) //TODO: Remove this
+    static std::shared_ptr<AVLTree<T>> treeFromArray(const T* arr, int size) //TODO: Remove this?
     {
         return StaticAVLUtilities::AVLFromArray(arr, size);
     }
 
-    static std::shared_ptr<AVLTree<T>> mergeTrees(const std::shared_ptr<AVLTree<int>>& t1, const std::shared_ptr<AVLTree<int>>& t2) //TODO: Remove this
+    static T* treeToArray(const AVLTree<T>& tree) //TODO: Remove this?
+    {
+        return StaticAVLUtilities::treeToArray(tree);
+    }
+
+    /*
+     * THIS RUINS THE PARAMETER TREES! CAREFUL!
+     */
+    static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2) //TODO: Remove this
     {
         return StaticAVLUtilities::mergeTrees(t1, t2);
     }
@@ -712,6 +734,8 @@ public:
     {
         this->freeList();
         this->root = nullptr;
+        this->highest = nullptr;
+        this->nodeCount = 0;
     }
 
     AVLTree(AVLTree& other) = delete;
