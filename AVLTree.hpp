@@ -621,7 +621,7 @@ public:
      * Adds a new node to the tree, keeping it a valid AVL one.
      * Potentially throws a memory allocation error.
      */
-    void removeNode(T value)
+    void removeNode(const T& value)
     {
         Order orderRel;
         Node<T>* node = findLocation(value, orderRel);
@@ -635,7 +635,7 @@ public:
 
     //TODO: Make sure no functions are exposed when they shouldn't be.
 
-    void addNode(T value)
+    T* addNode(const T& value)
     {
         Node<T>* newNode(new Node<T>(value));
         try
@@ -659,6 +659,7 @@ public:
             }
 
             ++nodeCount;
+            return &(newNode->getValue());
         }
         catch (std::exception& exception)
         {
@@ -683,6 +684,20 @@ public:
         return this->nodeCount;
     }
 
+    /*
+     * This function emulates searching an object by key. (For example: getValuePtr(Group(3)) to find group with id==3.)
+     */
+    T* getValuePtr(T value)
+    {
+        Order orderRel;
+        Node<T>* node = findLocation(value, orderRel);
+        if (orderRel != equal)
+        {
+            throw Failure();
+        }
+        return &(node->getValue());
+    }
+
     static std::shared_ptr<AVLTree<T>> treeFromArray(T* arr, int size) //TODO: Remove this
     {
         return StaticAVLUtilities::AVLFromArray(arr, size);
@@ -693,6 +708,12 @@ public:
         return StaticAVLUtilities::mergeTrees(t1, t2);
     }
 
+    void clean()
+    {
+        this->freeList();
+        this->root = nullptr;
+    }
+
     AVLTree(AVLTree& other) = delete;
     AVLTree& operator=(AVLTree& other) = delete;
     ~AVLTree()
@@ -701,4 +722,4 @@ public:
     }
 };
 
-#endif //AVLTree_HPP
+#endif //AVLTree_HPP 
