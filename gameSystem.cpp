@@ -14,8 +14,9 @@ void GameSystem::addPlayer(int player_id, int group_id, int level)
 
     Player plr(player_id, level, group_ptr);
    
-    Player *p = players.addNode(&plr),
-            *p_group = group_ptr->addPlayer(plr);
+    Player *p = players.addNode(&plr);
+
+    group_ptr->addPlayer(*p);
 
     PlayerById pbi(player_id, p);
     playersById.addNode(&pbi);
