@@ -1,6 +1,8 @@
 #ifndef AVLTREE_BIDIRECTIONAL_NODE
 #define AVLTREE_BIDIRECTIONAL_NODE
 
+#include <cassert>
+
 //A bidirectional node to be used for an AVL tree implementation.
 template <class T>
 class Node
@@ -11,8 +13,9 @@ private:
     Node<T>* right;
     Node<T>* parent;
     int height;
+    bool clone;
 public:
-    explicit Node(const T& value) : left(nullptr), right(nullptr), parent(nullptr), height(0)
+    explicit Node(T& value, bool clone=true) : left(nullptr), right(nullptr), parent(nullptr), height(0), clone(clone)
     {
         this->setValue(value);
     }
@@ -77,7 +80,13 @@ public:
 
     void setValue(const T& newValue)
     {
+        assert(clone);
         this->value = new T(newValue);
+    }
+
+    void setValue(T& newValue)
+    {
+        this->value = clone ? new T(newValue) : &newValue;
     }
 
     int getLeftHeight() const
@@ -92,7 +101,7 @@ public:
 
     ~Node()
     {
-        if (value != nullptr)
+        if (value != nullptr && clone)
         {
             delete value;
         }

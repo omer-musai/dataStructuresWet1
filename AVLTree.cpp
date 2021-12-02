@@ -127,6 +127,19 @@ int main() {
     catch (Failure exc) {
         cout << "Gr. 2 was removed :)\n";
     }
+    system.addGroup(2);
+    system.addPlayer(32, 1, 12);
+    system.addPlayer(720, 2, 16);
+    system.addPlayer(42, 1, 151);
+    players = system.getAllPlayersByLevel(-1, &count);
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    free(players);
+    cout << endl;
+
+    system.removePlayer(17);
+    players = system.getAllPlayersByLevel(-1, &count);
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    free(players);
 
     return 0;
 }

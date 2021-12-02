@@ -16,6 +16,7 @@ private:
     Node<T> *root;
     Node<T> *highest;
     int nodeCount;
+    bool clone;
 
     //Static utilities: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     class StaticAVLUtilities
@@ -26,25 +27,46 @@ private:
             T* array;
             int size;
             int index;
+            bool reverse;
 
         public:
             ArrayFromTreePopulator() = delete;
-            explicit ArrayFromTreePopulator(T* array, int size = -1):
-                    array(array), size(size), index(0)
-            {}
+            explicit ArrayFromTreePopulator(T* array, int size = -1, bool reverse=false):
+                    array(array), size(size), index(0), reverse(reverse)
+            {
+                if (reverse)
+                {
+                    if (size <= 0)
+                    {
+                        throw InvalidInput("Populator: reversing is only possible if size is provided.");
+                    }
+                    index = size - 1;
+                }
+            }
 
             void operator()(T value, int height, T parentValue, T leftValue, T rightValue, int BF) {
-                if (size < 0 || index < size) {
-                    array[index++] = value;
+                if (reverse)
+                {
+                    if(size < 0 || index >= 0)
+                    {
+                        array[index--] = value;
+                    }
+                }
+                else
+                {
+                    if (size < 0 || index < size)
+                    {
+                        array[index++] = value;
+                    }
                 }
             }
         };
 
-        static T* treeToArray(const AVLTree<T>& tree) {
+        static T* treeToArray(const AVLTree<T>& tree, bool reverse=false) {
             T* array = new T[tree.getSize()];
             try
             {
-                ArrayFromTreePopulator populator(array);
+                ArrayFromTreePopulator populator(array, tree.getSize(), reverse);
                 tree.inorder(populator);
             }
             catch (std::exception& exception)
@@ -85,16 +107,16 @@ private:
         };
 
         //This uses the algorithm described & proved in the doc.
-        static std::shared_ptr<AVLTree<T>> AVLFromArray(const T* arr, int size) {
+        static std::shared_ptr<AVLTree<T>> AVLFromArray(T* arr, int size) {
             assert(size > 0);
 
             std::shared_ptr<AVLTree<T>> tree = std::shared_ptr<AVLTree<T>>(new AVLTree<T>());
 
             int m = (size % 2 == 0 ? size / 2 : (size + 1) / 2) - 1; //m=ceil(size/2)-1
-            tree->addNode(arr[m]); //O(1) since the tree is empty.
+            tree->addNode(&arr[m]); //O(1) since the tree is empty.
 
             if (size == 2) {
-                tree->addNode(arr[m + 1]); //O(1) since the tree is always sized 1 and this point.
+                tree->addNode(&arr[m + 1]); //O(1) since the tree is always sized 1 and this point.
             } else if (size > 2) {
                 tree->setLeftSubtree(AVLFromArray(arr, m));
                 tree->setRightSubtree(AVLFromArray(arr + (m + 1), size - m - 1));
@@ -167,7 +189,10 @@ private:
 
     void freeList()
     {
-        freeListAux(root);
+        if (clone)
+        {
+            freeListAux(root);
+        }
     }
 
     void freeListAux(Node<T>* curr)
@@ -618,12 +643,8 @@ private:
     }
 
 public:
-    AVLTree()
-    {
-        root = nullptr;
-        highest = nullptr;
-        nodeCount = 0;
-    }
+    AVLTree(bool clone=true):root(nullptr),highest(nullptr),nodeCount(0),clone(clone)
+    {}
 
     /*
      * Adds a new node to the tree, keeping it a valid AVL one.
@@ -647,9 +668,9 @@ public:
 
     //TODO: Make sure no functions are exposed when they shouldn't be.
 
-    T* addNode(const T& value)
+    T* addNode(T* value)
     {
-        Node<T>* newNode(new Node<T>(value));
+        Node<T>* newNode(new Node<T>(*value, clone));
         try
         {
             if (root == nullptr)
@@ -659,7 +680,7 @@ public:
             else
             {
                 Order orderRel;
-                Node<T>* location = findLocation(value, orderRel);
+                Node<T>* location = findLocation(*value, orderRel);
                 addNodeToLocation(location, newNode, orderRel);
                 updateTree(newNode);
 
@@ -672,6 +693,11 @@ public:
 
             ++nodeCount;
             return &(newNode->getValue());
+        }
+        catch (Exception& exception)
+        {
+            delete newNode;
+            throw exception;
         }
         catch (std::exception& exception)
         {
@@ -712,14 +738,14 @@ public:
         return &(node->getValue());
     }
 
-    static std::shared_ptr<AVLTree<T>> treeFromArray(const T* arr, int size) //TODO: Remove this?
+    static std::shared_ptr<AVLTree<T>> treeFromArray(T* arr, int size) //TODO: Remove this?
     {
         return StaticAVLUtilities::AVLFromArray(arr, size);
     }
 
-    static T* treeToArray(const AVLTree<T>& tree) //TODO: Remove this?
+    static T* treeToArray(const AVLTree<T>& tree, bool reverse=false) //TODO: Remove this?
     {
-        return StaticAVLUtilities::treeToArray(tree);
+        return StaticAVLUtilities::treeToArray(tree, reverse);
     }
 
     /*

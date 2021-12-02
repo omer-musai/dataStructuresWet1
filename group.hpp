@@ -34,7 +34,6 @@ class Group
 
         void removeNode(const Player& plr)
         {
-            assert(!dummy);
             players->removeNode(plr);
         }
 
@@ -44,10 +43,10 @@ class Group
             return players->getSize();
         }
 
-        void addPlayer(const Player& player)
+        Player* addPlayer(Player& player)
         {
             assert(!dummy);
-            players->addNode(player);
+            return players->addNode(&player);
         }
 
         void mergeGroups(Group& other)

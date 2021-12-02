@@ -16,6 +16,8 @@ class GameSystem
 
 
     public:
+        GameSystem():nonEmptyGroups(true) {}
+
         void addGroup(int id);
         
         void addPlayer(int player_id, int group_id, int level);
@@ -28,7 +30,7 @@ class GameSystem
 
         int* getAllPlayersByLevel(int group_id, int* numOfPlayers);
 
-        static int* playersToIds(Player* plrs, int n);
+        static int* playersToIds(Player* player_arr, int n);
 
         int* getGroupsHighestLevel(int numOfGroups);
 };

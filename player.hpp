@@ -49,6 +49,11 @@ class Player
             return mainTree ? this->groupPtr : this->nonEmptyGroupPtr;
         }
 
+        void setNonEmptyGroupPtr(Group* group)
+        {
+            this->nonEmptyGroupPtr = group;
+        }
+
         bool operator<=(const Player& player) const
         {
             if (dummy)
