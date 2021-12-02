@@ -189,10 +189,7 @@ private:
 
     void freeList()
     {
-        if (clone)
-        {
-            freeListAux(root);
-        }
+        freeListAux(root);
     }
 
     void freeListAux(Node<T>* curr)
@@ -524,6 +521,22 @@ private:
             node = node->getLeft();
         }
         return node;
+    }
+
+    void updatePtr(T* ptr)
+    {
+        if (clone)
+        {
+            throw Failure("Can't update pointers in clone mode.");
+        }
+
+        Order orderRel;
+        Node<T>* node = findLocation(*ptr, orderRel);
+        if (orderRel != equal)
+        {
+            throw Failure("Tried to fetch non-existent node in updatePtr.");
+        }
+        node->setValue(ptr);
     }
 
     /*

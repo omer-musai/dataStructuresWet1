@@ -14,6 +14,22 @@ class Group
         std::shared_ptr<AVLTree<Player>> players;
         bool dummy; //Will be used to initialize arrays of Groups.
 
+        class GroupModifier
+        {
+            private:
+                Group* ptr;
+
+            public:
+                GroupModifier() = delete;
+                explicit GroupModifier(Group* ptr):ptr(ptr)
+                {}
+
+                void operator()(Player& value, int height, Player parentValue, Player leftValue, Player rightValue, int BF)
+                {
+                    value.setGroupPtr(ptr);
+                }
+        };
+
     public:
         Group() : id(0), players(nullptr), dummy(true) {}
 
@@ -53,6 +69,9 @@ class Group
         {
             assert(!dummy);
             //TODO: Ensure stuff get freed here by making some scary leakable Ts.
+            GroupModifier gm(this);
+            other.players->inorder(gm); //TODO: note in .lyx that this is fine complexity-wise.
+
             std::shared_ptr<AVLTree<Player>> newTree = AVLTree<Player>::mergeTrees(
                 *(this->players),
                 *(other.players)

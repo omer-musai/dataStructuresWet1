@@ -20,20 +20,11 @@ void GameSystem::addPlayer(int player_id, int group_id, int level)
     PlayerById pbi(player_id, p);
     playersById.addNode(&pbi);
 
-    Group* nonEmptyGroup;
-
     //TODO: Note in the .lyx that log(n_group)<log(n) in increaseLevel so we're still fine.
     if(group_ptr->getSize() == 1)
     {
-        nonEmptyGroup = nonEmptyGroups.addNode(group_ptr);
+        nonEmptyGroups.addNode(group_ptr);
     }
-    else
-    {
-        nonEmptyGroup = nonEmptyGroups.getValuePtr(group_id);
-    }
-
-    p->setNonEmptyGroupPtr(nonEmptyGroup);
-    p_group->setNonEmptyGroupPtr(nonEmptyGroup);
 }
 
 void GameSystem::removePlayer(int player_id)
@@ -52,7 +43,7 @@ void GameSystem::replaceGroup(int groupId, int replacementId)
 	{
 		throw InvalidInput("Invalid input in replaceGroup.");
 	}
-	bool nonEmpty;
+	bool nonEmpty; //TODO: Ensure exception thrown when not enough players printed. (Unrelated to this func)
 	
 	Group *group = this->groups.getValuePtr(groupId),
 		*replacement = this->groups.getValuePtr(replacementId);
@@ -61,7 +52,7 @@ void GameSystem::replaceGroup(int groupId, int replacementId)
 
 	if (nonEmpty)
     {
-	    nonEmptyGroups.removeNode(*nonEmptyGroups.getValuePtr(groupId));
+	    nonEmptyGroups.removeNode(*group);
     }
 
 	replacement->mergeGroups(*group);

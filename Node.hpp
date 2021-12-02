@@ -78,12 +78,6 @@ public:
         return *value;
     }
 
-    void setValue(const T& newValue)
-    {
-        assert(clone);
-        this->value = new T(newValue);
-    }
-
     void setValue(T& newValue)
     {
         this->value = clone ? new T(newValue) : &newValue;

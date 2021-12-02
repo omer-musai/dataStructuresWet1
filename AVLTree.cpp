@@ -137,9 +137,31 @@ int main() {
     cout << endl;
 
     system.removePlayer(17);
+    system.removePlayer(4);
     players = system.getAllPlayersByLevel(-1, &count);
     for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
     free(players);
+
+    /*GameSystem system;
+    system.addGroup(1);
+    system.addPlayer(1,1,10);
+    system.addPlayer(2,1,100);
+    system.addPlayer(3,1,1000);
+    system.removePlayer(1);
+
+    int count;
+    auto players = system.getAllPlayersByLevel(-1, &count);
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    cout << endl;
+    free(players);
+
+    system.addGroup(2);
+    system.addPlayer(4,2,10000);
+    system.replaceGroup(2,1);
+    players = system.getAllPlayersByLevel(-1, &count);
+    for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
+    cout << endl;
+    free(players);*/
 
     return 0;
 }

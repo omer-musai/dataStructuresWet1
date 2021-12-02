@@ -16,7 +16,7 @@ class GameSystem
 
 
     public:
-        GameSystem():nonEmptyGroups(true) {}
+        GameSystem():nonEmptyGroups(false) {}
 
         void addGroup(int id);
         

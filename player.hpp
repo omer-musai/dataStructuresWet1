@@ -11,13 +11,12 @@ class Player
         int id;
         int level;
         Group* groupPtr;
-        Group* nonEmptyGroupPtr;
         bool dummy; //"Dummy players" will be used to perform searching by key in the tree & initializing arrays.
 
     public:
-        explicit Player(int id = 0) : id(id), level(-1), groupPtr(nullptr), nonEmptyGroupPtr(nullptr), dummy(true) {}
+        explicit Player(int id = 0) : id(id), level(-1), groupPtr(nullptr), dummy(true) {}
         explicit Player(int id, int level, Group* groupPtr) : id(id), level(level),
-            groupPtr(groupPtr), nonEmptyGroupPtr(nullptr), dummy(false)
+            groupPtr(groupPtr), dummy(false)
         {
             if(level < 0 || id <= 0)
             {
@@ -42,16 +41,18 @@ class Player
             return id;
         }
 
-        Group* getGroupPtr(bool mainTree = true) const
+        Group* getGroupPtr() const
         {
             assert(dummy == false);
 
-            return mainTree ? this->groupPtr : this->nonEmptyGroupPtr;
+            return this->groupPtr;
         }
 
-        void setNonEmptyGroupPtr(Group* group)
+        void setGroupPtr(Group* ptr)
         {
-            this->nonEmptyGroupPtr = group;
+            assert(dummy == false);
+
+            this->groupPtr = ptr;
         }
 
         bool operator<=(const Player& player) const
