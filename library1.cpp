@@ -1,22 +1,104 @@
 #include "library1.h"
 #include "GameSystem.hpp"
+#include "game_exceptions.hpp"
 
-void *Init();
+#define TRY_CATCH_WRAP(action) \
+if (DS == NULL)                \
+{                              \
+    return INVALID_INPUT;      \
+}                              \
+try {                          \
+    action                     \
+}                              \
+catch(Failure& exc)            \
+{                              \
+    return FAILURE;            \
+}                              \
+catch(std::bad_alloc& exc)     \
+{                              \
+    return ALLOCATION_ERROR;   \
+}                              \
+catch(InvalidInput& exc)       \
+{                              \
+    return INVALID_INPUT;      \
+}                              \
+return SUCCESS
 
-StatusType AddGroup(void *DS, int GroupID);
+//TODO:
+//* Ensure order of exceptions.
+//* Ensure every time FAILURE is thrown, the data structure returns to its previous state.
 
-StatusType AddPlayer(void *DS, int PlayerID, int GroupID, int Level);
+void *Init()
+{
+    try
+    {
+        GameSystem* DS = new GameSystem();
+        return (void*)DS;
+    }
+    catch (std::bad_alloc& exc)
+    {
+        return NULL;
+    }
+}
 
-StatusType RemovePlayer(void *DS, int PlayerID);
+StatusType AddGroup(void *DS, int GroupID)
+{
+    TRY_CATCH_WRAP(
+            ((GameSystem*)DS)->addGroup(GroupID);
+    );
+}
 
-StatusType ReplaceGroup(void *DS, int GroupID, int ReplacementID);
+StatusType AddPlayer(void *DS, int PlayerID, int GroupID, int Level)
+{
+    TRY_CATCH_WRAP(
+            ((GameSystem*)DS)->addPlayer(PlayerID, GroupID, Level);
+    );
+}
 
-StatusType IncreaseLevel(void *DS, int PlayerID, int LevelIncrease);
+StatusType RemovePlayer(void *DS, int PlayerID)
+{
+    TRY_CATCH_WRAP(
+            ((GameSystem*)DS)->removePlayer(PlayerID);
+    );
+}
 
-StatusType GetHighestLevel(void *DS, int GroupID, int *PlayerID);
+StatusType ReplaceGroup(void *DS, int GroupID, int ReplacementID)
+{
+    TRY_CATCH_WRAP(
+            ((GameSystem*)DS)->replaceGroup(GroupID, ReplacementID);
+    );
+}
 
-StatusType GetAllPlayersByLevel(void *DS, int GroupID, int **Players, int *numOfPlayers);
+StatusType IncreaseLevel(void *DS, int PlayerID, int LevelIncrease)
+{
+    TRY_CATCH_WRAP(
+            ((GameSystem*)DS)->increaseLevel(PlayerID, LevelIncrease);
+    );
+}
 
-StatusType GetGroupsHighestLevel(void *DS, int numOfGroups, int **Players);
+StatusType GetHighestLevel(void *DS, int GroupID, int *PlayerID)
+{
+    TRY_CATCH_WRAP(
+            *PlayerID = ((GameSystem*)DS)->getHighestLevel(GroupID);
+    );
+}
 
-void Quit(void** DS);
+StatusType GetAllPlayersByLevel(void *DS, int GroupID, int **Players, int *numOfPlayers)
+{
+    TRY_CATCH_WRAP(
+            *Players = ((GameSystem*)DS)->getAllPlayersByLevel(GroupID, numOfPlayers);
+    );
+}
+
+StatusType GetGroupsHighestLevel(void *DS, int numOfGroups, int **Players)
+{
+    TRY_CATCH_WRAP(
+            *Players = ((GameSystem*)DS)->getGroupsHighestLevel(numOfGroups);
+    );
+}
+
+void Quit(void** DS)
+{
+    //TODO: Every group frees its n_group nodes. Make sure this doesn't screw with the O(n+k) complexity requirement.
+    *DS = nullptr;
+}
