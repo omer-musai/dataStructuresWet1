@@ -23,18 +23,6 @@ class Player
                 throw InvalidInput();
             }
         }
-       
-        void increaseLevel(int n)
-        {
-            assert(dummy == false);
-
-            if(n <= 0)
-            {
-                throw InvalidInput();
-            }
-            
-            this->level += n;
-        }
 
         int getId() const
         {

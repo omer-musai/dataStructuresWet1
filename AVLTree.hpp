@@ -359,13 +359,6 @@ private:
         //Update the height that was affected:
         oldRoot->updateHeight();
 
-        //TODO: delete
-        if (newRoot->getValue().getId() == 2)
-        {
-
-            if (newRoot->getRight()->getValue().getId() > 3) { int x = 3; } //doesn't cause uninit
-        }
-
         return newRoot;
     }
 
@@ -567,7 +560,6 @@ private:
         {
             //Can't just check if value > parent value because sorting may momentarily be broken
             //after using swapNodes for node removal.
-            if (node->getValue().getId() > 3) { int x = 3; }; //CAUSES UNINIT COND. (TODO: delete.)
             if (parent->getLeft() != nullptr && node->getValue() == parent->getLeft()->getValue())
             {
                 parent->setLeft(nullptr);
@@ -703,20 +695,6 @@ public:
                 Node<T>* location = findLocation(*value, orderRel);
                 addNodeToLocation(location, newNode, orderRel);
 
-                //TODO: delete
-                if(value->getId() == 3)
-                {
-                    if (orderRel == larger)
-                    {
-                        if (location->getRight()->getValue().getId() > 3) { int x = 3; } //doesn't cause uninit
-                    }
-                    else
-                    {
-                        if (location->getLeft()->getValue().getId() > 3) { int x = 3; }; //doesn't cause uninit
-                    }
-                }
-
-
                 updateTree(newNode);
 
                 assert(highest != nullptr);
@@ -786,7 +764,7 @@ public:
     /*
      * THIS RUINS THE PARAMETER TREES! CAREFUL!
      */
-    static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2) //TODO: Remove this
+    static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2)
     {
         return StaticAVLUtilities::mergeTrees(t1, t2);
     }
