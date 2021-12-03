@@ -3,7 +3,7 @@
 
 #include "AVLTree.hpp"
 #include "Player.hpp"
-#include "playerById.hpp"
+#include "PlayerById.hpp"
 #include "Group.hpp"
 
 class GameSystem

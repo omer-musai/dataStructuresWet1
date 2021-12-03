@@ -1,4 +1,4 @@
-#include "gameSystem.hpp"
+#include "GameSystem.hpp"
 #include <iostream>
 
 using std::cout;
