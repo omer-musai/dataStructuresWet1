@@ -19,6 +19,8 @@ class PlayerById
                 throw InvalidInput();
             }
         }
+
+        int getId() const {return id;}
         
         const Player* getPlayerPtr()
         {

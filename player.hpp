@@ -41,6 +41,11 @@ class Player
             return id;
         }
 
+        int getLevel() const
+        {
+            return level;
+        }
+
         Group* getGroupPtr() const
         {
             assert(dummy == false);

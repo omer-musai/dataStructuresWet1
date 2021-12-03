@@ -53,6 +53,11 @@ class Group
             players->removeNode(plr);
         }
 
+        int getId() const
+        {
+            return this->id;
+        }
+
         int getSize() const
         {
             assert(!dummy);

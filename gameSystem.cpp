@@ -2,37 +2,59 @@
 
 
 
-void GameSystem::addGroup(int id)
+void GameSystem::addGroup(int groupId)
 {
-    Group group(id);
+    Group group(groupId);
     groups.addNode(&group);
 }
 
-void GameSystem::addPlayer(int player_id, int group_id, int level)
+void GameSystem::addPlayer(int playerId, int groupId, int level)
 {
-    Group* group_ptr = groups.getValuePtr(group_id);
+    if (groupId <= 0)
+    {
+        throw InvalidInput("Invalid input provided to addPlayer.");
+    }
 
-    Player plr(player_id, level, group_ptr);
-   
+    addPlayer(playerId, groups.getValuePtr(groupId), level);
+}
+
+void GameSystem::addPlayer(int playerId, Group* groupPtr, int level)
+{
+    if (playerId <= 0 || level < 0)
+    {
+        throw InvalidInput("Invalid input provided to addPlayer.");
+    }
+
+    Player plr(playerId, level, groupPtr);
+
     Player *p = players.addNode(&plr);
 
-    group_ptr->addPlayer(*p);
+    groupPtr->addPlayer(*p);
 
-    PlayerById pbi(player_id, p);
+    PlayerById pbi(playerId, p);
     playersById.addNode(&pbi);
 
     //TODO: Note in the .lyx that log(n_group)<log(n) in increaseLevel so we're still fine.
-    if(group_ptr->getSize() == 1)
+    if(groupPtr->getSize() == 1)
     {
-        nonEmptyGroups.addNode(group_ptr);
+        nonEmptyGroups.addNode(groupPtr);
     }
 }
 
-void GameSystem::removePlayer(int player_id)
+void GameSystem::removePlayer(int playerId)
 {
-    const Player* plr = playersById.getValuePtr(PlayerById(player_id, nullptr))->getPlayerPtr();
-    
-    playersById.removeNode(PlayerById(player_id, plr));
+    if (playerId <= 0)
+    {
+        throw InvalidInput("Invalid input provided to GameSystem::removePlayer.");
+    }
+
+    const Player* plr = playersById.getValuePtr(PlayerById(playerId, nullptr))->getPlayerPtr();
+
+    playersById.removeNode(PlayerById(playerId, plr));
+    if (plr->getGroupPtr()->getSize() == 1)
+    {
+        nonEmptyGroups.removeNode(*plr->getGroupPtr()); //O(log(n)) since there are only at most as many non-empty groups as there are players.
+    }
     plr->getGroupPtr()->removeNode(*plr);
     players.removeNode(*plr);
 }
@@ -45,7 +67,7 @@ void GameSystem::replaceGroup(int groupId, int replacementId)
 		throw InvalidInput("Invalid input in replaceGroup.");
 	}
 	bool nonEmpty; //TODO: Ensure exception thrown when not enough players printed. (Unrelated to this func)
-	
+
 	Group *group = this->groups.getValuePtr(groupId),
 		*replacement = this->groups.getValuePtr(replacementId);
 
@@ -60,14 +82,14 @@ void GameSystem::replaceGroup(int groupId, int replacementId)
 	this->groups.removeNode(*group);
 }
 
-int GameSystem::getHighestLevel(int group_id)
+int GameSystem::getHighestLevel(int groupId)
 {
-    if(group_id == 0)
+    if(groupId == 0)
     {
         throw InvalidInput("Invalid input in getHighestLevel.");
     }
 
-    if(group_id < 0)
+    if(groupId < 0)
     {
         if(players.getSize() == 0)
         {
@@ -76,8 +98,8 @@ int GameSystem::getHighestLevel(int group_id)
         return players.getHighest().getId();
     }
 
-    Group* group = groups.getValuePtr(group_id);
-   
+    Group* group = groups.getValuePtr(groupId);
+
     if(group->getSize() == 0)
     {
         return -1;
@@ -85,36 +107,36 @@ int GameSystem::getHighestLevel(int group_id)
     return group->getHighest().getId();
 }
 
-int* GameSystem::getAllPlayersByLevel(int group_id, int* numOfPlayers)
+int* GameSystem::getAllPlayersByLevel(int groupId, int* numOfPlayers)
 {
-    if(group_id == 0)
+    if(groupId == 0)
     {
         throw InvalidInput("Invalid input in getAllPlayersByLevel.");
     }
 
-    if(group_id < 0)
+    if(groupId < 0)
     {
-        *numOfPlayers = players.getSize(); 
+        *numOfPlayers = players.getSize();
         if(*numOfPlayers == 0)
         {
             return nullptr;
         }
 
         Player* playersArr = AVLTree<Player>::treeToArray(this->players, true);
-        
+
         return playersToIds(playersArr, *numOfPlayers);
     }
 
-    Group* group = groups.getValuePtr(group_id);
+    Group* group = groups.getValuePtr(groupId);
 
-    *numOfPlayers = group->getSize(); 
+    *numOfPlayers = group->getSize();
     if(*numOfPlayers == 0)
     {
         return nullptr;
     }
 
     Player* playersArr = AVLTree<Player>::treeToArray(*group->getPlayers());
-    
+
     return playersToIds(playersArr, *numOfPlayers);
 }
 
@@ -125,14 +147,14 @@ int* GameSystem::playersToIds(Player* playersArr, int n)
     {
         throw AllocationError();
     }
-    
+
     for (int i = 0; i < n; i++)
     {
         arr[i] = playersArr[i].getId();
     }
     delete[] playersArr;
     return arr;
-} 
+}
 
 int* GameSystem::getGroupsHighestLevel(int numOfGroups)
 {
@@ -156,5 +178,21 @@ int* GameSystem::getGroupsHighestLevel(int numOfGroups)
     {
         arr[i] = groupsArr[i].getHighest().getId();
     }
+    delete[] groupsArr;
     return arr;
+}
+
+void GameSystem::increaseLevel(int playerId, int levelIncrease)
+{
+    if (playerId <= 0 || levelIncrease <= 0)
+    {
+        throw InvalidInput("Invalid input supplied to increaseLevel.");
+    }
+
+    const Player* plr = playersById.getValuePtr(PlayerById(playerId, nullptr))->getPlayerPtr(); //O(log(n))
+    int originalLevel = plr->getLevel();
+    Group* groupPtr = plr->getGroupPtr();
+
+    removePlayer(playerId); //O(log(n))
+    addPlayer(playerId, groupPtr, originalLevel + levelIncrease); //O(log(n)) since a group ptr is passed.
 }

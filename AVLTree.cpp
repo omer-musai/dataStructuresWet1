@@ -94,7 +94,7 @@ int main() {
     mergedTree->inorder(tv);
     tv.printRes();*/
 
-    GameSystem system;
+    /*GameSystem system;
     system.addGroup(1);
     system.addGroup(4);
     system.addGroup(3);
@@ -140,7 +140,7 @@ int main() {
     system.removePlayer(4);
     players = system.getAllPlayersByLevel(-1, &count);
     for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
-    free(players);
+    free(players);*/
 
     /*GameSystem system;
     system.addGroup(1);
@@ -162,6 +162,41 @@ int main() {
     for(int cnt = 0; cnt < count; ++cnt) std::cout << players[cnt] << " ";
     cout << endl;
     free(players);*/
+
+    GameSystem system;
+    system.addGroup(1);
+    system.addGroup(2);
+    system.addGroup(3);
+    system.addPlayer(1,1,10);
+    system.addPlayer(2,1,100);
+    system.addPlayer(3,1,1000);
+    system.removePlayer(3);
+    system.addPlayer(4,2,500);
+    system.addPlayer(5,3,500);
+    system.addPlayer(6,3,600);
+    system.removePlayer(6);
+    system.addPlayer(6,3,1600);
+    int* players = system.getGroupsHighestLevel(3);
+    for(int cnt = 0; cnt < 3; ++cnt) std::cout << players[cnt] << " ";
+    cout << endl;
+    free(players);
+
+    cout << "\nIncreasing #5's level by 10,000, and re-printing highest by groups:\n";
+    system.increaseLevel(5, 10000);
+    players = system.getGroupsHighestLevel(3);
+    for(int cnt = 0; cnt < 3; ++cnt) std::cout << players[cnt] << " ";
+    cout << endl;
+    free(players);
+
+
+    /*GameSystem system;
+    system.addGroup(1);
+    system.addGroup(2);
+    system.addGroup(3);
+    system.addPlayer(1, 1, 1);
+    system.addPlayer(2,2,2);
+    system.addPlayer(3,3,3); //Leak happens once we have 3 groups and remove the middle one.
+    system.removePlayer(2);*/
 
     return 0;
 }

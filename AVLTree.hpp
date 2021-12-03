@@ -98,7 +98,7 @@ private:
                     array[i++] = arr2[i2++];
                 }
             }
-            catch (std::exception& exception)
+            catch (std::out_of_range& exception)
             {
                 delete[] array;
             }
@@ -235,6 +235,7 @@ private:
         Node<T>* nextNode = rotate(node);
 
         Node<T>* parent = nextNode->getParent();
+
         if (!continueToRoot && (parent == nullptr || parent->getHeight() >= node->getHeight() + 1))
         {
             return;
@@ -357,6 +358,13 @@ private:
 
         //Update the height that was affected:
         oldRoot->updateHeight();
+
+        //TODO: delete
+        if (newRoot->getValue().getId() == 2)
+        {
+
+            if (newRoot->getRight()->getValue().getId() > 3) { int x = 3; } //doesn't cause uninit
+        }
 
         return newRoot;
     }
@@ -490,25 +498,6 @@ private:
         return newRoot;
     }
 
-    void swapNodes(Node<T>* a, Node<T>* b)
-    {
-        assert(a != nullptr && b != nullptr);
-
-        //Swapping highest ptr too if needed:
-        if (highest->getValue() == a->getValue())
-        {
-            highest = b;
-        }
-        else if (highest->getValue() == b->getValue())
-        {
-            highest = a;
-        }
-
-        T temp = a->getValue();
-        a->setValue(b->getValue());
-        b->setValue(temp);
-    }
-
     /*
      * Finds the next in order (inorder) in the specific relevant case within removeNode.
      */
@@ -578,6 +567,7 @@ private:
         {
             //Can't just check if value > parent value because sorting may momentarily be broken
             //after using swapNodes for node removal.
+            if (node->getValue().getId() > 3) { int x = 3; }; //CAUSES UNINIT COND. (TODO: delete.)
             if (parent->getLeft() != nullptr && node->getValue() == parent->getLeft()->getValue())
             {
                 parent->setLeft(nullptr);
@@ -655,8 +645,25 @@ private:
         }
     }
 
+    void swapNodes(Node<T>* a, Node<T>* b)
+    {
+        assert(a != nullptr && b != nullptr);
+
+        //Swapping highest ptr too if needed:
+        if (highest->getValue() == a->getValue())
+        {
+            highest = b;
+        }
+        else if (highest->getValue() == b->getValue())
+        {
+            highest = a;
+        }
+
+        a->swap(b);
+    }
+
 public:
-    AVLTree(bool clone=true):root(nullptr),highest(nullptr),nodeCount(0),clone(clone)
+    explicit AVLTree(bool clone=true):root(nullptr),highest(nullptr),nodeCount(0),clone(clone)
     {}
 
     /*
@@ -695,6 +702,21 @@ public:
                 Order orderRel;
                 Node<T>* location = findLocation(*value, orderRel);
                 addNodeToLocation(location, newNode, orderRel);
+
+                //TODO: delete
+                if(value->getId() == 3)
+                {
+                    if (orderRel == larger)
+                    {
+                        if (location->getRight()->getValue().getId() > 3) { int x = 3; } //doesn't cause uninit
+                    }
+                    else
+                    {
+                        if (location->getLeft()->getValue().getId() > 3) { int x = 3; }; //doesn't cause uninit
+                    }
+                }
+
+
                 updateTree(newNode);
 
                 assert(highest != nullptr);
@@ -751,12 +773,12 @@ public:
         return &(node->getValue());
     }
 
-    static std::shared_ptr<AVLTree<T>> treeFromArray(T* arr, int size) //TODO: Remove this?
+    static std::shared_ptr<AVLTree<T>> treeFromArray(T* arr, int size)
     {
         return StaticAVLUtilities::AVLFromArray(arr, size);
     }
 
-    static T* treeToArray(const AVLTree<T>& tree, bool reverse=false) //TODO: Remove this?
+    static T* treeToArray(const AVLTree<T>& tree, bool reverse=false)
     {
         return StaticAVLUtilities::treeToArray(tree, reverse);
     }

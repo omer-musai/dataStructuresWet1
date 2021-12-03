@@ -14,25 +14,29 @@ class GameSystem
         AVLTree<Group> groups;
         AVLTree<Group> nonEmptyGroups;
 
+        void addPlayer(int playerId, Group* groupPtr, int level);
+
+        static int* playersToIds(Player* player_arr, int n);
+
 
     public:
         GameSystem():nonEmptyGroups(false) {}
 
-        void addGroup(int id);
+        void addGroup(int groupId);
         
-        void addPlayer(int player_id, int group_id, int level);
+        void addPlayer(int playerId, int groupId, int level);
         
         void replaceGroup(int groupId, int replacementId);
 
-        void removePlayer(int player_id);
+        void removePlayer(int playerId);
 
-        int getHighestLevel(int group_id);
+        int getHighestLevel(int groupId);
 
-        int* getAllPlayersByLevel(int group_id, int* numOfPlayers);
-
-        static int* playersToIds(Player* player_arr, int n);
+        int* getAllPlayersByLevel(int groupId, int* numOfPlayers);
 
         int* getGroupsHighestLevel(int numOfGroups);
+
+        void increaseLevel(int playerId, int levelIncrease);
 };
 
 

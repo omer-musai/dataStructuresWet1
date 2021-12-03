@@ -14,8 +14,37 @@ private:
     Node<T>* parent;
     int height;
     bool clone;
+
+    void swapParent(Node<T>* other)
+    {
+        Node<T>* tempPtr = other->getParent();
+        other->setParent(this->getParent());
+        this->setParent(tempPtr);
+    }
+
+    void swapLeft(Node<T>* other)
+    {
+        Node<T>* tempPtr = other->getLeft();
+        other->setLeft(this->getLeft());
+        this->setLeft(tempPtr);
+    }
+
+    void swapRight(Node<T>* other)
+    {
+        Node<T>* tempPtr = other->getRight();
+        other->setRight(this->getRight());
+        this->setRight(tempPtr);
+    }
+
+    void swapHeight(Node<T>* other)
+    {
+        int tempHeight = other->getHeight();
+        other->setHeight(this->getHeight());
+        this->setHeight(tempHeight);
+    }
+
 public:
-    explicit Node(T& value, bool clone=true) : left(nullptr), right(nullptr), parent(nullptr), height(0), clone(clone)
+    explicit Node(T& value, bool clone=true) : left(nullptr), right(nullptr), parent(nullptr), height(0), clone(clone), value(nullptr)
     {
         this->setValue(value);
     }
@@ -73,6 +102,11 @@ public:
         return height;
     }
 
+    int setHeight(int height)
+    {
+        this->height = height;
+    }
+
     T& getValue() const
     {
         return *value;
@@ -80,6 +114,10 @@ public:
 
     void setValue(T& newValue)
     {
+        if (clone && value != nullptr)
+        {
+            delete value;
+        }
         this->value = clone ? new T(newValue) : &newValue;
     }
 
@@ -91,6 +129,13 @@ public:
     int getRightHeight() const
     {
         return right == nullptr ? -1 : right->height;
+    }
+
+    void swap(Node<T>* other)
+    {
+        T* temp = other->value;
+        other->value = value;
+        value = temp;
     }
 
     ~Node()
