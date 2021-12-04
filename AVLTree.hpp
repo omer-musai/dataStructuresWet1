@@ -228,6 +228,19 @@ private:
         return findLocationAux(value, nextNode, orderRel);
     }
 
+    template <class K>
+    Node<T>* findByKey(K key, bool* found)
+    {
+        T value(key);
+        Order orderRel;
+        Node<T>* node = findLocation(value, orderRel);
+        if (found != nullptr)
+        {
+            *found = !(node == nullptr || orderRel != equal);
+        }
+        return node;
+    }
+
     //Updates heights and returns the lowest node with an invalid balance factor.
     void updateTree(Node<T>* node, bool continueToRoot=false)
     {
@@ -742,14 +755,21 @@ public:
     template <class K>
     T* getValuePtr(K key)
     {
-        T value(key);
-        Order orderRel;
-        Node<T>* node = findLocation(value, orderRel);
-        if (node == nullptr || orderRel != equal)
+        bool found;
+        Node<T>* node = findByKey(key, &found);
+        if (!found)
         {
             throw Failure("Tried to fetch non-existent node.");
         }
         return &(node->getValue());
+    }
+
+    template <class K>
+    bool isInTree(K key)
+    {
+        bool found;
+        findByKey(key, &found);
+        return found;
     }
 
     static std::shared_ptr<AVLTree<T>> treeFromArray(T** arr, int size, bool clone=true)
