@@ -67,11 +67,6 @@ void GameSystem::replaceGroup(int groupId, int replacementId)
 		throw InvalidInput("Invalid input in replaceGroup.");
 	}
 
-	if (groupId == 38266725 && replacementId == 632047742)
-    {
-	    int x = 3; //TODO: delete
-    }
-
 	bool nonEmpty; //TODO: Ensure exception thrown when not enough players printed. (Unrelated to this func)
 
 	Group *group = this->groups.getValuePtr(groupId),
@@ -195,19 +190,9 @@ void GameSystem::increaseLevel(int playerId, int levelIncrease)
         throw InvalidInput("Invalid input supplied to increaseLevel.");
     }
 
-    if (playerId == 772986531)
-    {
-        int x = 3; //TODO: delete
-    }
-
     const Player* plr = playersById.getValuePtr(PlayerById(playerId, nullptr))->getPlayerPtr(); //O(log(n))
     int originalLevel = plr->getLevel();
     Group* groupPtr = plr->getGroupPtr();
-
-    if (playerId == 772986531)
-    {
-        int x = 3; //TODO: delete
-    }
 
     removePlayer(playerId); //O(log(n))
     addPlayer(playerId, groupPtr, originalLevel + levelIncrease); //O(log(n)) since a group ptr is passed.
