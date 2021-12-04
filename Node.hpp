@@ -16,7 +16,7 @@ private:
     bool clone;
 
 public:
-    explicit Node(T& value, bool clone=true) : left(nullptr), right(nullptr), parent(nullptr), height(0), clone(clone), value(nullptr)
+    explicit Node(T& value, bool clone=true) : value(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0), clone(clone)
     {
         this->setValue(value);
     }

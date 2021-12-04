@@ -33,8 +33,7 @@ class Group
     public:
         Group() : id(0), players(nullptr), dummy(true) {}
 
-        explicit Group(int id) : players(std::make_shared<AVLTree<Player>>(false)),
-        id(id), dummy(false)
+        explicit Group(int id) : id(id), players(std::make_shared<AVLTree<Player>>(false)), dummy(dummy)
         {
             if(id <= 0)
             {
