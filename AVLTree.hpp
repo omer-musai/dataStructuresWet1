@@ -77,14 +77,13 @@ private:
             return array;
         }
 
-        template <typename I>
-        static I* arrayMerge(I* arr1, int size1, I* arr2, int size2) {
-            I *array = new I[size1 + size2];
+        static T** arrayMerge(T** arr1, int size1, T** arr2, int size2) {
+            T** array = new T*[size1 + size2];
             try
             {
                 int i1 = 0, i2 = 0, i = 0;
                 while (i1 < size1 && i2 < size2) {
-                    array[i] = arr1[i1] < arr2[i2] ? arr1[i1] : arr2[i2];
+                    array[i] = (*arr1[i1]) < (*arr2[i2]) ? arr1[i1] : arr2[i2];
                     if (array[i] == arr1[i1]) {
                         ++i1;
                     } else {
