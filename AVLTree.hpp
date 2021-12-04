@@ -108,18 +108,20 @@ private:
 
         //This uses the algorithm described & proved in the doc.
         static std::shared_ptr<AVLTree<T>> AVLFromArray(T* arr, int size) {
-            assert(size > 0);
+            assert(size >= 0);
 
             std::shared_ptr<AVLTree<T>> tree = std::shared_ptr<AVLTree<T>>(new AVLTree<T>());
+            if (size > 0)
+            {
+                int m = (size % 2 == 0 ? size / 2 : (size + 1) / 2) - 1; //m=ceil(size/2)-1
+                tree->addNode(&arr[m]); //O(1) since the tree is empty.
 
-            int m = (size % 2 == 0 ? size / 2 : (size + 1) / 2) - 1; //m=ceil(size/2)-1
-            tree->addNode(&arr[m]); //O(1) since the tree is empty.
-
-            if (size == 2) {
-                tree->addNode(&arr[m + 1]); //O(1) since the tree is always sized 1 and this point.
-            } else if (size > 2) {
-                tree->setLeftSubtree(AVLFromArray(arr, m));
-                tree->setRightSubtree(AVLFromArray(arr + (m + 1), size - m - 1));
+                if (size == 2) {
+                    tree->addNode(&arr[m + 1]); //O(1) since the tree is always sized 1 and this point.
+                } else if (size > 2) {
+                    tree->setLeftSubtree(AVLFromArray(arr, m));
+                    tree->setRightSubtree(AVLFromArray(arr + (m + 1), size - m - 1));
+                }
             }
 
             return tree;
@@ -560,7 +562,8 @@ private:
         {
             //Can't just check if value > parent value because sorting may momentarily be broken
             //after using swapNodes for node removal.
-            if (parent->getLeft() != nullptr && node->getValue() == parent->getLeft()->getValue())
+            //if (parent->getLeft() != nullptr && node->getValue() == parent->getLeft()->getValue())
+            if (parent->getLeft() == node)
             {
                 parent->setLeft(nullptr);
             }
@@ -593,7 +596,7 @@ private:
         }
         else
         {
-            if (parent->getValue() > node->getValue())
+            if (parent->getLeft() == node)
             {
                 parent->setLeft(child);
             }
@@ -650,6 +653,9 @@ private:
         {
             highest = a;
         }
+
+        //If highest is root then it can only have at most 1 left child, so we won't get here.
+        //if ()
 
         a->swap(b);
     }
