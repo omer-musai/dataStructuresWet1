@@ -25,6 +25,11 @@ void GameSystem::addPlayer(int playerId, Group* groupPtr, int level)
         throw InvalidInput("Invalid input provided to addPlayer.");
     }
 
+    if (playersById.getValuePtr(PlayerById(playerId, nullptr)) != nullptr)
+    {
+        throw Failure("Attempted to add player that's already in the tree.");
+    }
+
     Player plr(playerId, level, groupPtr);
 
     Player *p = players.addNode(&plr);
