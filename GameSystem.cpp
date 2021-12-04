@@ -147,7 +147,7 @@ int* GameSystem::getAllPlayersByLevel(int groupId, int* numOfPlayers)
         return nullptr;
     }
 
-    Player** playersArr = AVLTree<Player>::treeToArray(*group->getPlayers());
+    Player** playersArr = AVLTree<Player>::treeToArray(*group->getPlayers(), true);
 
     return playersToIds(playersArr, *numOfPlayers);
 }
