@@ -16,7 +16,7 @@ class GameSystem
 
         void addPlayer(int playerId, Group* groupPtr, int level);
 
-        static int* playersToIds(Player* player_arr, int n);
+        static int* playersToIds(Player** player_arr, int n);
 
 
     public:

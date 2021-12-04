@@ -78,7 +78,8 @@ class Group
 
             std::shared_ptr<AVLTree<Player>> newTree = AVLTree<Player>::mergeTrees(
                 *(this->players),
-                *(other.players)
+                *(other.players),
+                false //Keep pointers, not copies.
             );
             this->players = newTree;
             //other.players->clean(); Should be done by mergeTrees itself.

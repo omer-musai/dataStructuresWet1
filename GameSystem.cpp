@@ -79,7 +79,13 @@ void GameSystem::replaceGroup(int groupId, int replacementId)
 	    nonEmptyGroups.removeNode(*group);
     }
 
+	int originalSize = replacement->getSize();
 	replacement->mergeGroups(*group);
+	if (originalSize == 0 && replacement->getSize() > 0)
+    {
+	    nonEmptyGroups.addNode(replacement);
+    }
+
 	this->groups.removeNode(*group);
 }
 
@@ -123,7 +129,7 @@ int* GameSystem::getAllPlayersByLevel(int groupId, int* numOfPlayers)
             return nullptr;
         }
 
-        Player* playersArr = AVLTree<Player>::treeToArray(this->players, true);
+        Player** playersArr = AVLTree<Player>::treeToArray(this->players, true);
 
         return playersToIds(playersArr, *numOfPlayers);
     }
@@ -136,12 +142,12 @@ int* GameSystem::getAllPlayersByLevel(int groupId, int* numOfPlayers)
         return nullptr;
     }
 
-    Player* playersArr = AVLTree<Player>::treeToArray(*group->getPlayers());
+    Player** playersArr = AVLTree<Player>::treeToArray(*group->getPlayers());
 
     return playersToIds(playersArr, *numOfPlayers);
 }
 
-int* GameSystem::playersToIds(Player* playersArr, int n)
+int* GameSystem::playersToIds(Player** playersArr, int n)
 {
     int* arr = (int*)malloc(sizeof(int) * n);
     if(!arr)
@@ -151,7 +157,7 @@ int* GameSystem::playersToIds(Player* playersArr, int n)
 
     for (int i = 0; i < n; i++)
     {
-        arr[i] = playersArr[i].getId();
+        arr[i] = playersArr[i]->getId();
     }
     delete[] playersArr;
     return arr;
@@ -174,10 +180,10 @@ int* GameSystem::getGroupsHighestLevel(int numOfGroups)
         throw AllocationError();
     }
 
-    Group* groupsArr = AVLTree<Group>::treeToArray(this->nonEmptyGroups);
+    Group** groupsArr = AVLTree<Group>::treeToArray(this->nonEmptyGroups);
     for(int i = 0; i < numOfGroups; i++)
     {
-        arr[i] = groupsArr[i].getHighest().getId();
+        arr[i] = groupsArr[i]->getHighest().getId();
     }
     delete[] groupsArr;
     return arr;

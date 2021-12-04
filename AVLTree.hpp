@@ -16,7 +16,7 @@ private:
     Node<T> *root;
     Node<T> *highest;
     int nodeCount;
-    bool clone;
+    const bool clone;
 
     //Static utilities: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     class StaticAVLUtilities
@@ -24,14 +24,14 @@ private:
         friend class AVLTree;
         class ArrayFromTreePopulator {
         private:
-            T* array;
+            T** array;
             int size;
             int index;
             bool reverse;
 
         public:
             ArrayFromTreePopulator() = delete;
-            explicit ArrayFromTreePopulator(T* array, int size = -1, bool reverse=false):
+            explicit ArrayFromTreePopulator(T** array, int size = -1, bool reverse=false):
                     array(array), size(size), index(0), reverse(reverse)
             {
                 if (reverse)
@@ -44,26 +44,26 @@ private:
                 }
             }
 
-            void operator()(T value, int height, T parentValue, T leftValue, T rightValue, int BF) {
+            void operator()(T& value, int height, T parentValue, T leftValue, T rightValue, int BF) {
                 if (reverse)
                 {
                     if(size < 0 || index >= 0)
                     {
-                        array[index--] = value;
+                        array[index--] = &value;
                     }
                 }
                 else
                 {
                     if (size < 0 || index < size)
                     {
-                        array[index++] = value;
+                        array[index++] = &value;
                     }
                 }
             }
         };
 
-        static T* treeToArray(const AVLTree<T>& tree, bool reverse=false) {
-            T* array = new T[tree.getSize()];
+        static T** treeToArray(const AVLTree<T>& tree, bool reverse=false) {
+            T** array = new T*[tree.getSize()];
             try
             {
                 ArrayFromTreePopulator populator(array, tree.getSize(), reverse);
@@ -77,8 +77,9 @@ private:
             return array;
         }
 
-        static T* arrayMerge(T* arr1, int size1, T* arr2, int size2) {
-            T *array = new T[size1 + size2];
+        template <typename I>
+        static I* arrayMerge(I* arr1, int size1, I* arr2, int size2) {
+            I *array = new I[size1 + size2];
             try
             {
                 int i1 = 0, i2 = 0, i = 0;
@@ -107,20 +108,20 @@ private:
         };
 
         //This uses the algorithm described & proved in the doc.
-        static std::shared_ptr<AVLTree<T>> AVLFromArray(T* arr, int size) {
+        static std::shared_ptr<AVLTree<T>> AVLFromArray(T** arr, int size, bool clone=true) {
             assert(size >= 0);
 
-            std::shared_ptr<AVLTree<T>> tree = std::shared_ptr<AVLTree<T>>(new AVLTree<T>());
+            std::shared_ptr<AVLTree<T>> tree = std::shared_ptr<AVLTree<T>>(new AVLTree<T>(clone));
             if (size > 0)
             {
                 int m = (size % 2 == 0 ? size / 2 : (size + 1) / 2) - 1; //m=ceil(size/2)-1
-                tree->addNode(&arr[m]); //O(1) since the tree is empty.
+                tree->addNode(arr[m]); //O(1) since the tree is empty.
 
                 if (size == 2) {
-                    tree->addNode(&arr[m + 1]); //O(1) since the tree is always sized 1 and this point.
+                    tree->addNode(arr[m + 1]); //O(1) since the tree is always sized 1 and this point.
                 } else if (size > 2) {
-                    tree->setLeftSubtree(AVLFromArray(arr, m));
-                    tree->setRightSubtree(AVLFromArray(arr + (m + 1), size - m - 1));
+                    tree->setLeftSubtree(AVLFromArray(arr, m, clone));
+                    tree->setRightSubtree(AVLFromArray(arr + (m + 1), size - m - 1, clone));
                 }
             }
 
@@ -128,15 +129,15 @@ private:
         }
 
         //THIS RUINS THE PARAMETER TREES. Careful!
-        static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2) {
-            T *t1arr = nullptr, *t2arr = nullptr, *merged = nullptr;
+        static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2, bool clone=true) {
+            T **t1arr = nullptr, **t2arr = nullptr, **merged = nullptr;
             int totalSize = t1.getSize() + t2.getSize();
             std::shared_ptr<AVLTree<T>> result;
             try {
                 t1arr = treeToArray(t1);
                 t2arr = treeToArray(t2);
                 merged = arrayMerge(t1arr, t1.getSize(), t2arr, t2.getSize());
-                result = treeFromArray(merged, totalSize);
+                result = treeFromArray(merged, totalSize, clone);
                 t1.clean();
                 t2.clean();
             }
@@ -672,7 +673,7 @@ public:
     {
         Order orderRel;
         Node<T>* node = findLocation(value, orderRel);
-        if (orderRel != equal)
+        if (node == nullptr || orderRel != equal)
         {
             //Node isn't in the tree.
             throw Failure("Tried to remove non-existent node.");
@@ -752,12 +753,12 @@ public:
         return &(node->getValue());
     }
 
-    static std::shared_ptr<AVLTree<T>> treeFromArray(T* arr, int size)
+    static std::shared_ptr<AVLTree<T>> treeFromArray(T** arr, int size, bool clone=true)
     {
-        return StaticAVLUtilities::AVLFromArray(arr, size);
+        return StaticAVLUtilities::AVLFromArray(arr, size, clone);
     }
 
-    static T* treeToArray(const AVLTree<T>& tree, bool reverse=false)
+    static T** treeToArray(const AVLTree<T>& tree, bool reverse=false)
     {
         return StaticAVLUtilities::treeToArray(tree, reverse);
     }
@@ -765,9 +766,9 @@ public:
     /*
      * THIS RUINS THE PARAMETER TREES! CAREFUL!
      */
-    static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2)
+    static std::shared_ptr<AVLTree<T>> mergeTrees(AVLTree<T>& t1, AVLTree<T>& t2, bool clone=true)
     {
-        return StaticAVLUtilities::mergeTrees(t1, t2);
+        return StaticAVLUtilities::mergeTrees(t1, t2, clone);
     }
 
     void clean()

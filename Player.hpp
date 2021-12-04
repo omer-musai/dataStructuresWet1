@@ -82,7 +82,8 @@ class Player
 
         bool operator==(const Player& player) const
         {
-            assert(dummy || !(this->id == player.id && this->level != player.level));
+            //This can actually happen if trying to add a player that's already in the system.
+            //assert(dummy || !(this->id == player.id && this->level != player.level));
         
             return this->id == player.id;
         }
