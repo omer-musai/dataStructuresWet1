@@ -99,6 +99,6 @@ StatusType GetGroupsHighestLevel(void *DS, int numOfGroups, int **Players)
 
 void Quit(void** DS)
 {
-    //TODO: Every group frees its n_group nodes. Make sure this doesn't screw with the O(n+k) complexity requirement.
-    *DS = nullptr;
+    delete ((GameSystem*)*DS);
+    *DS = NULL;
 }

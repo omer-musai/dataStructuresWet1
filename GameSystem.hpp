@@ -9,10 +9,10 @@
 class GameSystem
 {
     private:
-        AVLTree<PlayerById> playersById;
-        AVLTree<Player> players;
         AVLTree<Group> groups;
+        AVLTree<Player> players;
         AVLTree<Group> nonEmptyGroups;
+        AVLTree<PlayerById> playersById;
 
         void addPlayer(int playerId, Group* groupPtr, int level);
 

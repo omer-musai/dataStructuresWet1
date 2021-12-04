@@ -37,8 +37,8 @@ typedef enum {
 	INCREASELEVEL_CMD = 5,
 	GETHIGHESTLEVEL_CMD = 6,
 	GETALLPLAYERS_CMD = 7,
-	QUIT_CMD = 8,
-	GETGROUPSHIGHEST_CMD=9
+	GETGROUPSHIGHEST_CMD = 8,
+	QUIT_CMD = 9
 } commandType;
 
 static const int numActions = 10;

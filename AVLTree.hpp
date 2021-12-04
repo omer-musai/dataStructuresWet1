@@ -707,12 +707,7 @@ public:
             ++nodeCount;
             return &(newNode->getValue());
         }
-        catch (Exception& exception)
-        {
-            delete newNode;
-            throw exception;
-        }
-        catch (std::exception& exception)
+        catch (Failure& exception)
         {
             delete newNode;
             throw exception;
@@ -744,7 +739,7 @@ public:
         T value(key);
         Order orderRel;
         Node<T>* node = findLocation(value, orderRel);
-        if (orderRel != equal)
+        if (node == nullptr || orderRel != equal)
         {
             throw Failure("Tried to fetch non-existent node.");
         }

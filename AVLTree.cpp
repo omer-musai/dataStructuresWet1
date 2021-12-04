@@ -163,7 +163,7 @@ int main() {
     cout << endl;
     free(players);*/
 
-    GameSystem system;
+    /*GameSystem system;
     system.addGroup(1);
     system.addGroup(2);
     system.addGroup(3);
@@ -186,7 +186,7 @@ int main() {
     players = system.getGroupsHighestLevel(3);
     for(int cnt = 0; cnt < 3; ++cnt) std::cout << players[cnt] << " ";
     cout << endl;
-    free(players);
+    free(players);*/
 
 
     /*GameSystem system;
@@ -198,5 +198,9 @@ int main() {
     system.addPlayer(3,3,3); //Leak happens once we have 3 groups and remove the middle one.
     system.removePlayer(2);*/
 
+    GameSystem *system = new GameSystem();
+    system->addGroup(1);
+    system->addPlayer(1,1,1);
+    delete system;
     return 0;
 }
