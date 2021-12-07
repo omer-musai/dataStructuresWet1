@@ -256,7 +256,7 @@ private:
             return;
         }
 
-        updateTree(parent);
+        updateTree(parent, continueToRoot);
 
     }
 
