@@ -78,6 +78,7 @@ StatusType IncreaseLevel(void *DS, int PlayerID, int LevelIncrease)
 
 StatusType GetHighestLevel(void *DS, int GroupID, int *PlayerID)
 {
+    if (PlayerID == nullptr) return INVALID_INPUT;
     TRY_CATCH_WRAP(
             *PlayerID = ((GameSystem*)DS)->getHighestLevel(GroupID);
     );
@@ -85,6 +86,7 @@ StatusType GetHighestLevel(void *DS, int GroupID, int *PlayerID)
 
 StatusType GetAllPlayersByLevel(void *DS, int GroupID, int **Players, int *numOfPlayers)
 {
+    if (Players == nullptr) return INVALID_INPUT;
     TRY_CATCH_WRAP(
             *Players = ((GameSystem*)DS)->getAllPlayersByLevel(GroupID, numOfPlayers);
     );
@@ -92,6 +94,7 @@ StatusType GetAllPlayersByLevel(void *DS, int GroupID, int **Players, int *numOf
 
 StatusType GetGroupsHighestLevel(void *DS, int numOfGroups, int **Players)
 {
+    if (Players == nullptr) return INVALID_INPUT;
     TRY_CATCH_WRAP(
             *Players = ((GameSystem*)DS)->getGroupsHighestLevel(numOfGroups);
     );

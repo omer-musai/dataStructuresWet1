@@ -10,7 +10,7 @@ void GameSystem::addGroup(int groupId)
 
 void GameSystem::addPlayer(int playerId, int groupId, int level)
 {
-    if (groupId <= 0)
+    if (playerId <= 0 || groupId <= 0 || level < 0)
     {
         throw InvalidInput("Invalid input provided to addPlayer.");
     }
@@ -121,7 +121,7 @@ int GameSystem::getHighestLevel(int groupId)
 
 int* GameSystem::getAllPlayersByLevel(int groupId, int* numOfPlayers)
 {
-    if(groupId == 0)
+    if(groupId == 0 || numOfPlayers == nullptr)
     {
         throw InvalidInput("Invalid input in getAllPlayersByLevel.");
     }
